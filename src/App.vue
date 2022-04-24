@@ -1,21 +1,39 @@
 <script setup lang="ts">
-// This starter template is using Vue 3 <script setup> SFCs
-// Check out https://vuejs.org/api/sfc-script-setup.html#script-setup
-import HelloWorld from './components/HelloWorld.vue'
+import { watch } from 'vue'
+import { useThrottle } from '@vueuse/core'
+import Canvas from './components/Canvas.vue'
+
+const canvas = $ref<typeof Canvas | null>(null)
+const expression = $ref('sin(t)')
+const thorrtled = useThrottle($$(expression), 500)
+
+const MathContext = `const {${Object.getOwnPropertyNames(Math).join(',')}}=Math`
+let fn = $ref((t: number, i: number, x: number, y: number) => 0)
+
+watch(
+  thorrtled,
+  (exp, prev) => {
+    const formatExp = `()=>{
+      ${MathContext};
+      return (t,i,x,y) => {
+        return ${exp.replace(/(\d+)(\w+)/g, (_, n, x) => `${n} * ${x}`)}
+      }
+    }`
+    try {
+      fn = eval(formatExp)()
+      if (canvas) {
+        canvas.restart()
+      }
+    } catch (e) {}
+  },
+  { immediate: true },
+)
 </script>
 
 <template>
-  <img alt="Vue logo" src="./assets/logo.png" />
-  <HelloWorld msg="Hello Vue 3 + TypeScript + Vite" />
+  <Canvas ref="canvas" :fn="fn" :exp="thorrtled" />
+  <div>
+    <p>(t, i, x, y) =></p>
+    <input v-model="expression" autocomplete="false" spellcheck="false" />
+  </div>
 </template>
-
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-</style>
