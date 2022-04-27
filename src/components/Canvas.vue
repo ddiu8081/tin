@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted } from 'vue'
 import p5 from 'p5'
 
 interface Props {
   fn: (t: number, i: number, x: number, y: number) => number
-  exp: string,
+  exp: string
 }
 
 const props = defineProps<Props>()
 
-const dom = ref(null)
+const dom = $ref(null)
 
 let dots: Dot[] = []
 let time = 0
@@ -66,13 +66,6 @@ class Dot {
 }
 
 function calc(t: number, i: number, x: number, y: number) {
-  // return Math.sin(t)
-  // return i / 256
-  // return y - 2 * t
-  // return Math.sin(t - Math.sqrt((x - 7.5) ** 2 + (y - 6) ** 2))
-  // return Math.sin(y / 8 + t)
-  // return Math.random() * 2 - 1
-  // return Math.sin(i ** 2)
   try {
     return props.fn(t, i, x, y)
   } catch (e) {
@@ -81,8 +74,8 @@ function calc(t: number, i: number, x: number, y: number) {
 }
 
 onMounted(() => {
-  if (dom.value) {
-    new p5(sketch, dom.value)
+  if (dom) {
+    new p5(sketch, dom)
   }
 })
 
@@ -99,5 +92,5 @@ defineExpose({
 </script>
 
 <template>
-  <div class="w-24 h-24" ref="dom"></div>
+  <div ref="dom"></div>
 </template>
