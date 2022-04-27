@@ -18,7 +18,7 @@ watchDebounced(
   (exp: string) => {
     console.log(exp)
     try {
-      fn = getMathFn('t, i, x, y', exp)
+      fn = getMathFn('t, i, x', exp)
       restart()
     } catch (e) { }
   },
@@ -33,10 +33,8 @@ const sketch = (s: p5) => {
     s.createCanvas(400, 400)
     s.noStroke()
     s.rectMode(s.RADIUS)
-    for (let y = 0; y < 16; y++) {
-      for (let x = 0; x < 16; x++) {
-        dots.push(new Dot(s, x, y))
-      }
+    for (let x = 0; x < 32; x++) {
+      dots.push(new Dot(s, x))
     }
   }
 
@@ -45,8 +43,8 @@ const sketch = (s: p5) => {
     s.background(250)
 
     for (let i = 0; i < dots.length; i++) {
-      const [x, y] = dots[i].getXY()
-      const value = calc(time, i, x, y)
+      const [x] = dots[i].getX()
+      const value = calc(time, i, x)
       dots[i].setValue(value)
     }
   }
@@ -55,15 +53,13 @@ const sketch = (s: p5) => {
 class Dot {
   s: p5
   x: number
-  y: number
-  constructor(s: p5, x: number, y: number) {
+  constructor(s: p5, x: number) {
     this.s = s
     this.x = x
-    this.y = y
   }
 
-  getXY() {
-    return [this.x, this.y]
+  getX() {
+    return [this.x]
   }
 
   setValue(value: number) {
@@ -74,15 +70,15 @@ class Dot {
     }
 
     const color = value > 0 ? [133, 200, 138] : [110, 110, 110]
-    const center = [this.x * 24 + 20, this.y * 24 + 20]
+    const center = [this.x * 12 + 20, 200]
     this.s.fill(...color as [number, number, number])
-    this.s.square(...center as [number, number], 10 * value)
+    this.s.rect(...center as [number, number], 5, 200 * value)
   }
 }
 
-function calc(t: number, i: number, x: number, y: number) {
+function calc(t: number, i: number, x: number) {
   try {
-    return fn(t, i, x, y)
+    return fn(t, i, x)
   } catch (e) {
     return 1
   }
