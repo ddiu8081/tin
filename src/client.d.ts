@@ -1,0 +1,1 @@
+type MathFn = (...args: any[]) => number

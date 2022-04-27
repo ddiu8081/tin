@@ -1,15 +1,29 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { onMounted, watch } from 'vue'
+import { watchDebounced } from '@vueuse/core'
+import { getMathFn } from '@/utils'
 import p5 from 'p5'
 
 interface Props {
-  fn: (t: number, i: number, x: number, y: number) => number
   exp: string
 }
 
 const props = defineProps<Props>()
 
 const dom = $ref(null)
+let fn = $ref<MathFn>(() => 0)
+
+watchDebounced(
+  () => props.exp,
+  (exp: string) => {
+    console.log(exp)
+    try {
+      fn = getMathFn('t, i, x, y', exp)
+      restart()
+    } catch (e) { }
+  },
+  { immediate: true, debounce: 500 },
+)
 
 let dots: Dot[] = []
 let time = 0
@@ -67,7 +81,7 @@ class Dot {
 
 function calc(t: number, i: number, x: number, y: number) {
   try {
-    return props.fn(t, i, x, y)
+    return fn(t, i, x, y)
   } catch (e) {
     return 1
   }
@@ -82,7 +96,6 @@ onMounted(() => {
 const restart = () => {
   console.log('restart')
   time = 0
-  console.log(props.fn)
 }
 
 defineExpose({
