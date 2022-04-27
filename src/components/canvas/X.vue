@@ -72,7 +72,7 @@ class Dot {
     const color = value > 0 ? [133, 200, 138] : [110, 110, 110]
     const center = [this.x * 12 + 20, 200]
     this.s.fill(...color as [number, number, number])
-    this.s.rect(...center as [number, number], 5, 200 * value)
+    this.s.rect(...center as [number, number], 5, 160 * value)
   }
 }
 
