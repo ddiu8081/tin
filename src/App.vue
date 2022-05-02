@@ -4,7 +4,8 @@ import { useToggle } from '@vueuse/core'
 
 import X from './components/canvas/X.vue'
 import XY from './components/canvas/XY.vue'
-import Footer from './components/Footer.vue';
+import XYZ from './components/canvas/XYZ.vue'
+import Footer from './components/Footer.vue'
 
 const paramList: IndexExpressionItem[] = [
   {
@@ -14,16 +15,16 @@ const paramList: IndexExpressionItem[] = [
   }, {
     text: 't, i, x, y',
     canvas: markRaw(XY),
-    defaultExp: 'sin(2*t)',
+    defaultExp: 'sin(t)',
   }, {
     text: 't, i, x, y, z',
-    canvas: markRaw(XY),
-    defaultExp: 'sin(3*t)',
+    canvas: markRaw(XYZ),
+    defaultExp: 'sin(t)',
   }
 ]
 
 let expression = $ref('sin(t)')
-let currentParam = $ref(paramList[1])
+let currentParam = $ref(paramList[0])
 const [dropDownOpen, toggleDropdown] = useToggle()
 
 const setExpression = (exp: IndexExpressionItem) => {

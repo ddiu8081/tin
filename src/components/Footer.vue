@@ -9,6 +9,14 @@
           class="text-emerald-600">Antfu.100</a>
         .
       </li>
+      <li class="mt-1 text-gray-600">
+        Made by
+        <a href="https://ddiu.me" target="_blank" class="text-emerald-600">Diu</a>
+        |
+        <a href="https://github.com/ddiu8081/tin" target="_blank"
+          class="text-emerald-600">Source Code</a>
+        .
+      </li>
     </ul>
   </footer>
 </template>
