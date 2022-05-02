@@ -35,9 +35,7 @@ const setExpression = (exp: IndexExpressionItem) => {
 
 <template>
   <div m="x-auto y-24" class="w-[400px]">
-    <keep-alive>
-      <component :is="currentParam.canvas" :exp="expression"></component>
-    </keep-alive>
+    <component :is="currentParam.canvas" :exp="expression"></component>
     <div mt-12 text-left px-3>
       <div relative text-sm select-none class="-mx-2">
         <span @click="toggleDropdown()" p="x-2 y-1.5" rounded-md cursor-pointer op-50 hover="bg-gray-100 op-80">({{currentParam.text}})</span>

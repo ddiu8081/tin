@@ -39,7 +39,7 @@ const sketch = (s: p5) => {
   }
 
   s.draw = () => {
-    time += 1 / 60
+    time += s.deltaTime / 1000
     s.background(250)
 
     for (let i = 0; i < dots.length; i++) {
