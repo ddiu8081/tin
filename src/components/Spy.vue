@@ -72,8 +72,15 @@ const sketch = (s: p5) => {
   <div>
     <div class="flex gap-2">
       <div v-for="key in Object.keys(parsedValue)">
-        <span class="text-xs">{{ key }}=</span>
-        <span class="text-xs">{{ parsedValue[key].toFixed(2) }}</span>    
+        <div v-if="key !== 'v'" class="op-70">
+          <span class="text-xs">{{ key }}=</span>
+          <span class="text-xs">{{ parsedValue[key].toFixed(2) }}</span>    
+        </div>
+      </div>
+      <div class="flex-1"></div>
+      <div>
+        <span class="text-xs font-bold">value=</span>
+        <span class="text-xs">{{ parsedValue.v.toFixed(2) }}</span>
       </div>
     </div>
     <div ref="spyCanvas" class="border border-gray-500"></div>

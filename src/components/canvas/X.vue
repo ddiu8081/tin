@@ -137,6 +137,6 @@ defineExpose({
     v-if="highlightPoint.i >= 0"
     :fn="fn"
     :params="{ ...highlightPoint, t: time }"
-    class="mt-4"
+    class="mt-8"
   />
 </template>
