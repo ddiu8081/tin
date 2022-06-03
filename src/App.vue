@@ -23,7 +23,7 @@ const paramList: IndexExpressionItem[] = [
   }
 ]
 
-let expression = $ref('sin(t)')
+let expression = $ref('sin(t + i/5)')
 let currentParam = $ref(paramList[0])
 const [dropDownOpen, toggleDropdown] = useToggle()
 

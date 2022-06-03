@@ -5,6 +5,7 @@ import p5 from 'p5'
 
 import { getMathFn, isDarkMode } from '@/utils'
 import colors from '@/colors'
+import Spy from '@/components/Spy.vue'
 
 interface Props {
   exp: string
@@ -15,6 +16,11 @@ const props = defineProps<Props>()
 const dom = ref(null)
 const { width } = useElementSize(dom)
 let fn = $ref<MathFn>(() => 0)
+const time = ref(0)
+let highlightPoint = $ref({
+  i: -1,
+  x: -1,
+})
 
 watchDebounced(
   () => props.exp,
@@ -29,7 +35,6 @@ watchDebounced(
 )
 
 let dots: Dot[] = []
-let time = 0
 
 const sketch = (s: p5) => {
   s.setup = () => {
@@ -37,18 +42,18 @@ const sketch = (s: p5) => {
     s.noStroke()
     s.rectMode(s.RADIUS)
     for (let x = 0; x < 32; x++) {
-      dots.push(new Dot(s, x))
+      dots.push(new Dot(s, x, x))
     }
   }
 
   s.draw = () => {
-    time += s.deltaTime / 1000
+    time.value += s.deltaTime / 1000
     const isDark = isDarkMode()
     s.background(isDark ? '#1e1e1e' : '#fafafa')
 
     for (let i = 0; i < dots.length; i++) {
       const [x] = dots[i].getX()
-      const value = calc(time, i, x)
+      const value = calc(time.value, i, x)
       dots[i].setValue(value)
     }
   }
@@ -56,13 +61,29 @@ const sketch = (s: p5) => {
   s.windowResized = () => {
     s.resizeCanvas(width.value, width.value)
   }
+
+  s.mouseClicked = () => {
+    const x = s.mouseX
+    const canvasLength = s.width
+    const itemWidth = canvasLength / 32
+    let clickedItemIndex = Math.ceil(x / itemWidth) - 1
+    if (clickedItemIndex === highlightPoint.i) {
+      clickedItemIndex = -1
+    }
+    highlightPoint = {
+      i: clickedItemIndex,
+      x: clickedItemIndex,
+    }
+  }
 }
 
 class Dot {
   s: p5
+  i: number
   x: number
-  constructor(s: p5, x: number) {
+  constructor(s: p5, i: number, x: number) {
     this.s = s
+    this.i = i
     this.x = x
   }
 
@@ -78,10 +99,10 @@ class Dot {
       value = 1
     }
 
-    const color = value > 0 ? colors.plus : colors.minus
+    const valueColor = value > 0 ? colors.plus : colors.minus
     const itemWidth = canvasLength / 32
     const itemCenter = [itemWidth * this.x + itemWidth / 2, canvasLength / 2]
-    this.s.fill(color)
+    this.s.fill(highlightPoint.i < 0 || this.i === highlightPoint.i ? valueColor : [...valueColor, 80])
     this.s.rect(...itemCenter as [number, number], itemWidth / 2 - 1, canvasLength / 2 * value)
   }
 }
@@ -101,7 +122,7 @@ onMounted(() => {
 })
 
 const restart = () => {
-  time = 0
+  time.value = 0
 }
 
 defineExpose({
@@ -111,5 +132,11 @@ defineExpose({
 </script>
 
 <template>
-  <div ref="dom" class="w-full h-full border border-gray-100"></div>
+  <div ref="dom" class="border border-gray-100"></div>
+  <Spy
+    v-if="highlightPoint.i >= 0"
+    :fn="fn"
+    :params="{ ...highlightPoint, t: time }"
+    class="mt-4"
+  />
 </template>
