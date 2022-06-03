@@ -14,3 +14,7 @@ export function getMathFn(inputParam: string, expression: string): MathFn {
   }`
   return eval(formatExp)()
 }
+
+export function isDarkMode(): boolean {
+  return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+}

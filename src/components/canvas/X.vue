@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
-import { watchDebounced } from '@vueuse/core'
-import { getMathFn } from '@/utils'
+import { onMounted, ref } from 'vue'
+import { watchDebounced, useElementSize } from '@vueuse/core'
 import p5 from 'p5'
+
+import { getMathFn, isDarkMode } from '@/utils'
+import colors from '@/colors'
 
 interface Props {
   exp: string
@@ -10,7 +12,8 @@ interface Props {
 
 const props = defineProps<Props>()
 
-const dom = $ref(null)
+const dom = ref(null)
+const { width } = useElementSize(dom)
 let fn = $ref<MathFn>(() => 0)
 
 watchDebounced(
@@ -30,7 +33,7 @@ let time = 0
 
 const sketch = (s: p5) => {
   s.setup = () => {
-    s.createCanvas(400, 400)
+    s.createCanvas(width.value, width.value)
     s.noStroke()
     s.rectMode(s.RADIUS)
     for (let x = 0; x < 32; x++) {
@@ -40,13 +43,18 @@ const sketch = (s: p5) => {
 
   s.draw = () => {
     time += s.deltaTime / 1000
-    s.background(250)
+    const isDark = isDarkMode()
+    s.background(isDark ? '#1e1e1e' : '#fafafa')
 
     for (let i = 0; i < dots.length; i++) {
       const [x] = dots[i].getX()
       const value = calc(time, i, x)
       dots[i].setValue(value)
     }
+  }
+
+  s.windowResized = () => {
+    s.resizeCanvas(width.value, width.value)
   }
 }
 
@@ -63,16 +71,18 @@ class Dot {
   }
 
   setValue(value: number) {
+    const canvasLength = this.s.width
     if (value < -1) {
       value = -1
     } else if (value > 1) {
       value = 1
     }
 
-    const color = value > 0 ? [133, 200, 138] : [110, 110, 110]
-    const center = [this.x * 12 + 20, 200]
-    this.s.fill(...color as [number, number, number])
-    this.s.rect(...center as [number, number], 5, 160 * value)
+    const color = value > 0 ? colors.plus : colors.minus
+    const itemWidth = canvasLength / 32
+    const itemCenter = [itemWidth * this.x + itemWidth / 2, canvasLength / 2]
+    this.s.fill(color)
+    this.s.rect(...itemCenter as [number, number], itemWidth / 2 - 1, canvasLength / 2 * value)
   }
 }
 
@@ -85,8 +95,8 @@ function calc(t: number, i: number, x: number) {
 }
 
 onMounted(() => {
-  if (dom) {
-    new p5(sketch, dom)
+  if (dom.value) {
+    new p5(sketch, dom.value)
   }
 })
 
@@ -101,5 +111,5 @@ defineExpose({
 </script>
 
 <template>
-  <div ref="dom"></div>
+  <div ref="dom" class="w-full h-full border border-gray-100"></div>
 </template>
