@@ -88,7 +88,7 @@ class Dot {
   }
 
   getX() {
-    return [this.x]
+    return [this.x] 
   }
 
   setValue(value: number) {
