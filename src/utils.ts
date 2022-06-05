@@ -1,3 +1,5 @@
+import { useDark } from '@vueuse/core'
+
 const replaceReg = (rawExpression: string) => {
   const reg = /(\d+)([a-zA-Z]+)/g
   return rawExpression.replace(reg, (_, p1, p2) => `${p1} * ${p2}`)
@@ -15,6 +17,4 @@ export function getMathFn(inputParam: string, expression: string): MathFn {
   return eval(formatExp)()
 }
 
-export function isDarkMode(): boolean {
-  return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
-}
+export const isDark = useDark()

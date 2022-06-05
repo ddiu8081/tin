@@ -3,7 +3,7 @@ import { computed, onMounted } from 'vue'
 import { useElementSize } from '@vueuse/core'
 import p5 from 'p5'
 
-import { isDarkMode } from '@/utils'
+import { isDark } from '@/utils'
 
 interface Props {
   fn: MathFn
@@ -44,8 +44,7 @@ const sketch = (s: p5) => {
   }
 
   s.draw = () => {
-    const isDark = isDarkMode()
-    s.background(isDark ? '#1e1e1e' : '#fafafa')
+    s.background(isDark.value ? '#1e1e1e' : '#fafafa')
 
     // draw a line of the fn
     s.stroke('#666666')

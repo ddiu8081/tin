@@ -3,7 +3,7 @@ import { onMounted, ref } from 'vue'
 import { watchDebounced, useElementSize } from '@vueuse/core'
 import p5 from 'p5'
 
-import { getMathFn, isDarkMode } from '@/utils'
+import { getMathFn, isDark } from '@/utils'
 import colors from '@/colors'
 import Spy from '@/components/Spy.vue'
 
@@ -48,8 +48,7 @@ const sketch = (s: p5) => {
 
   s.draw = () => {
     time.value += s.deltaTime / 1000
-    const isDark = isDarkMode()
-    s.background(isDark ? '#1e1e1e' : '#fafafa')
+    s.background(isDark.value ? '#1e1e1e' : '#fafafa')
 
     for (let i = 0; i < dots.length; i++) {
       const [x] = dots[i].getX()
