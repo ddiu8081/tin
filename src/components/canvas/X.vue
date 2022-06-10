@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { watchDebounced, useElementSize } from '@vueuse/core'
 import p5 from 'p5'
 
@@ -14,13 +14,16 @@ interface Props {
 const props = defineProps<Props>()
 
 const dom = ref(null)
-const { width } = useElementSize(dom)
+let p5Instance = $ref<p5 | null>(null)
+const { width: canvasW } = $(useElementSize(dom))
 let fn = $ref<MathFn>(() => 0)
-const time = ref(0)
+let time = $ref(0)
 let highlightPoint = $ref({
   i: -1,
   x: -1,
 })
+
+let dots: Dot[] = []
 
 watchDebounced(
   () => props.exp,
@@ -34,11 +37,16 @@ watchDebounced(
   { immediate: true, debounce: 500 },
 )
 
-let dots: Dot[] = []
+watch($$(canvasW), (w) => {
+  if (p5Instance && w > 0) {
+    p5Instance.resizeCanvas(w, w)
+  }
+})
 
 const sketch = (s: p5) => {
   s.setup = () => {
-    s.createCanvas(width.value, width.value)
+    p5Instance = s
+    s.createCanvas(canvasW, canvasW)
     s.noStroke()
     s.rectMode(s.RADIUS)
     for (let x = 0; x < 32; x++) {
@@ -47,18 +55,14 @@ const sketch = (s: p5) => {
   }
 
   s.draw = () => {
-    time.value += s.deltaTime / 1000
+    time += s.deltaTime / 1000
     s.background(isDark.value ? '#1e1e1e' : '#fafafa')
 
     for (let i = 0; i < dots.length; i++) {
       const [x] = dots[i].getX()
-      const value = calc(time.value, i, x)
+      const value = calc(time, i, x)
       dots[i].setValue(value)
     }
-  }
-
-  s.windowResized = () => {
-    s.resizeCanvas(width.value, width.value)
   }
 
   s.mouseClicked = () => {
@@ -121,7 +125,7 @@ onMounted(() => {
 })
 
 const restart = () => {
-  time.value = 0
+  time = 0
 }
 
 defineExpose({
