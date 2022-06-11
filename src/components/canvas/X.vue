@@ -102,7 +102,8 @@ class Dot {
       value = 1
     }
 
-    const valueColor = value > 0 ? colors.plus : colors.minus
+    const theme = isDark.value ? 'dark' : 'light'
+    const valueColor = value > 0 ? colors[theme].plus : colors[theme].minus
     const itemWidth = canvasLength / 32
     const itemCenter = [itemWidth * this.x + itemWidth / 2, canvasLength / 2]
     this.s.fill(highlightPoint.i < 0 || this.i === highlightPoint.i ? valueColor : [...valueColor, 80])
@@ -135,7 +136,7 @@ defineExpose({
 </script>
 
 <template>
-  <div ref="dom" class="border border-gray-100"></div>
+  <div ref="dom"></div>
   <Spy
     v-if="highlightPoint.i >= 0"
     :fn="fn"

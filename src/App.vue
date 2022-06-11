@@ -41,19 +41,19 @@ const setExpression = (exp: IndexExpressionItem) => {
       <div class="relative -mx-2 text-sm select-none">
         <span
           @click="toggleDropdown()"
-          class="x-2 y-1.5 rounded-md cursor-pointer op-50 hover:bg-gray-100 hover:op-80"
+          class="pl-2 py-1.5 rounded-md cursor-pointer op-50 hover:bg-gray-100 hover:op-80 dark:hover:bg-truegray-700"
         >
           ({{currentParam.text}})
         </span>
         <span class="ml-1 op-50">=></span>
         <div
           v-show="dropDownOpen"
-          class="absolute top-full mt-2 py-2 rounded-md shadow-md bg-white border border-gray-100"
+          class="absolute top-full mt-2 py-2 rounded-md shadow-md bg-white border border-gray-100 dark:bg-truegray-800 dark:border-truegray-600"
         >
           <div
             v-for="param in paramList"
             @click="setExpression(param)"
-            class="px-3 py-2 cursor-pointer hover:bg-gray-100"
+            class="px-3 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-truegray-600"
           >
             {{ param.text }}
           </div>

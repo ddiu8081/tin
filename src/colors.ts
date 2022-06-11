@@ -1,8 +1,24 @@
 type ColorArr = [number, number, number]
 
-const colorDict: { [key: string]: ColorArr } = {
-  plus: [130, 115, 151],
-  minus: [68, 68, 68],
+interface ColorDictItem {
+  plus: ColorArr
+  minus: ColorArr
+}
+
+interface ColorDict {
+  light: ColorDictItem
+  dark: ColorDictItem
+}
+
+const colorDict: ColorDict = {
+  light: {
+    plus: [148, 180, 159],
+    minus: [180, 180, 180],
+  },
+  dark: {
+    plus: [148, 180, 159],
+    minus: [100, 100, 100],
+  },
 }
 
 export default colorDict
