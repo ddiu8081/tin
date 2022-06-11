@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, watch } from 'vue'
 import { useElementSize } from '@vueuse/core'
 import p5 from 'p5'
 
 import { isDark } from '@/utils'
+import colors from '@/colors'
 
 interface Props {
   fn: MathFn
@@ -27,7 +28,11 @@ const parsedValue: { [key: string]: any } = computed(() => {
   }
 })
 const spyCanvas = $ref(null)
-const { width } = useElementSize(spyCanvas)
+let p5Instance = $ref<p5 | null>(null)
+const { width: canvasW } = $(useElementSize($$(spyCanvas)))
+const currentTheme = computed<'dark' | 'light'>(() => {
+  return isDark.value ? 'dark' : 'light'
+})
 
 onMounted(() => {
   if (!spyCanvas) {
@@ -36,32 +41,40 @@ onMounted(() => {
   new p5(sketch, spyCanvas)
 })
 
+watch($$(canvasW), (w) => {
+  if (p5Instance && w > 0) {
+    p5Instance.resizeCanvas(w, 100)
+  }
+})
+
 const sketch = (s: p5) => {
   s.setup = () => {
-    s.createCanvas(350, 100)
+    p5Instance = s
+    s.createCanvas(canvasW, 100)
     s.noStroke()
     s.rectMode(s.RADIUS)
   }
 
   s.draw = () => {
-    s.background(isDark.value ? '#1e1e1e' : '#fafafa')
-
-    // draw a line of the fn
-    s.stroke('#666666')
+    s.background(colors[currentTheme.value].background)
+    s.stroke(colors[currentTheme.value].foreground, 50)
+    s.strokeWeight(1)
     s.line(0, 50, 350, 50)
-    s.fill('#fc915390')
+    s.line(200, 0, 200, 100)
     for (let i = 0; i < 350; i++) {
-      const dotTime = parsedValue.value.t + (i - 180) / 30
+      const dotTime = parsedValue.value.t + (i - 200) / 30
       const dotValue = props.fn(dotTime, parsedValue.value.i, parsedValue.value.x)
-      s.circle(i, 50 - dotValue * 40, 2)
+      if (i > 200) {
+        s.stroke(colors[currentTheme.value].foreground, 50)
+      } else {
+        s.stroke(colors[currentTheme.value].foreground)
+      }
+      s.point(i, 50 - dotValue * 40)
     }
-    // current dot
-    s.fill('#fc9153')
-    s.circle(180, 50 - parsedValue.value.v * 40, 8)
-  }
 
-  s.windowResized = () => {
-    s.resizeCanvas(width.value, width.value)
+    s.stroke(colors[currentTheme.value].foreground)
+    s.strokeWeight(4)
+    s.point(200, 50 - parsedValue.value.v * 40)
   }
 }
 

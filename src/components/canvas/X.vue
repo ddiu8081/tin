@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue'
+import { onMounted, watch, computed } from 'vue'
 import { watchDebounced, useElementSize } from '@vueuse/core'
 import p5 from 'p5'
 
@@ -13,9 +13,12 @@ interface Props {
 
 const props = defineProps<Props>()
 
-const dom = ref(null)
+const dom = $ref(null)
 let p5Instance = $ref<p5 | null>(null)
-const { width: canvasW } = $(useElementSize(dom))
+const { width: canvasW } = $(useElementSize($$(dom)))
+const currentTheme = computed<'dark' | 'light'>(() => {
+  return isDark.value ? 'dark' : 'light'
+})
 let fn = $ref<MathFn>(() => 0)
 let time = $ref(0)
 let highlightPoint = $ref({
@@ -25,6 +28,12 @@ let highlightPoint = $ref({
 let hoveredPointIndex = $ref(-1)
 
 let dots: Dot[] = []
+
+onMounted(() => {
+  if (dom) {
+    new p5(sketch, dom)
+  }
+})
 
 watchDebounced(
   () => props.exp,
@@ -57,7 +66,7 @@ const sketch = (s: p5) => {
 
   s.draw = () => {
     time += s.deltaTime / 1000
-    s.background(isDark.value ? '#1e1e1e' : '#fafafa')
+    s.background(colors[currentTheme.value].background)
 
     for (let i = 0; i < dots.length; i++) {
       const [x] = dots[i].getX()
@@ -122,7 +131,6 @@ class Dot {
       value = 1
     }
 
-    // get opacity
     let opacity = 255
     if (highlightPoint.i !== -1) {
       opacity = 80
@@ -138,8 +146,7 @@ class Dot {
       }
     }
 
-    const theme = isDark.value ? 'dark' : 'light'
-    const valueColor = value > 0 ? colors[theme].plus : colors[theme].minus
+    const valueColor = value > 0 ? colors[currentTheme.value].plus : colors[currentTheme.value].minus
     const itemWidth = canvasLength / 32
     const itemCenter = [itemWidth * this.x + itemWidth / 2, canvasLength / 2]
     this.s.fill([...valueColor, opacity])
@@ -155,12 +162,6 @@ function calc(t: number, i: number, x: number) {
   }
 }
 
-onMounted(() => {
-  if (dom.value) {
-    new p5(sketch, dom.value)
-  }
-})
-
 const restart = () => {
   time = 0
 }
@@ -174,7 +175,7 @@ defineExpose({
 <template>
   <div ref="dom"></div>
   <Spy
-    v-if="highlightPoint.i >= 0"
+    v-if="highlightPoint.i !== -1"
     :fn="fn"
     :params="{ ...highlightPoint, t: time }"
     class="mt-8"
