@@ -22,6 +22,7 @@ let highlightPoint = $ref({
   i: -1,
   x: -1,
 })
+let hoveredPointIndex = $ref(-1)
 
 let dots: Dot[] = []
 
@@ -65,7 +66,26 @@ const sketch = (s: p5) => {
     }
   }
 
+  s.mouseMoved = () => {
+    if (s.mouseX < 0 || s.mouseX > s.width || s.mouseY < 0 || s.mouseY > s.height) {
+      hoveredPointIndex = -1
+      return
+    }
+    const x = s.mouseX
+    const canvasLength = s.width
+    const itemWidth = canvasLength / 32
+    let hoveredItemIndex = Math.ceil(x / itemWidth) - 1
+    hoveredPointIndex = hoveredItemIndex
+  }
+
   s.mouseClicked = () => {
+    if (s.mouseX < 0 || s.mouseX > s.width || s.mouseY < 0 || s.mouseY > s.height) {
+      highlightPoint = {
+        i: -1,
+        x: -1,
+      }
+      return
+    }
     const x = s.mouseX
     const canvasLength = s.width
     const itemWidth = canvasLength / 32
@@ -102,11 +122,27 @@ class Dot {
       value = 1
     }
 
+    // get opacity
+    let opacity = 255
+    if (highlightPoint.i !== -1) {
+      opacity = 80
+      if (highlightPoint.i === this.i) {
+        opacity = 255
+      } else if (hoveredPointIndex === this.i) {
+        opacity = 200
+      }
+    } else {
+      opacity = 200
+      if (hoveredPointIndex === this.i) {
+        opacity = 255
+      }
+    }
+
     const theme = isDark.value ? 'dark' : 'light'
     const valueColor = value > 0 ? colors[theme].plus : colors[theme].minus
     const itemWidth = canvasLength / 32
     const itemCenter = [itemWidth * this.x + itemWidth / 2, canvasLength / 2]
-    this.s.fill(highlightPoint.i < 0 || this.i === highlightPoint.i ? valueColor : [...valueColor, 80])
+    this.s.fill([...valueColor, opacity])
     this.s.rect(...itemCenter as [number, number], itemWidth / 2 - 1, canvasLength / 2 * value)
   }
 }
