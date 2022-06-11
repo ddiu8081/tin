@@ -18,7 +18,7 @@ const props = defineProps<Props>()
 
 const currentValue = computed(() => {
   const { fn, time, params } = props
-  return fn(time, params.i, params.x, params.y)
+  return fn(time, params.i, params.x, params.y, params.z)
 })
 const spyCanvas = $ref(null)
 let p5Instance = $ref<p5 | null>(null)
@@ -56,7 +56,7 @@ const sketch = (s: p5) => {
     s.line(200, 0, 200, 100)
     for (let i = 0; i < 350; i++) {
       const dotTime = props.time + (i - 200) / 30
-      const dotValue = props.fn(dotTime, props.params.i, props.params.x, props.params.y)
+      const dotValue = props.fn(dotTime, props.params.i, props.params.x, props.params.y, props.params.z)
       if (i > 200) {
         s.stroke(colors[currentTheme.value].foreground, 50)
       } else {

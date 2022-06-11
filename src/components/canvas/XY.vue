@@ -27,7 +27,7 @@ let highlightPoint = $ref({
   y: -1,
 })
 let hoveredPointIndex = $ref(-1)
-let dots: Dot[] = []
+const dots: Dot[] = []
 
 onMounted(() => {
   if (dom) {
