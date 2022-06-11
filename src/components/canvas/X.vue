@@ -14,11 +14,11 @@ interface Props {
 const props = defineProps<Props>()
 
 const dom = $ref(null)
-let p5Instance = $ref<p5 | null>(null)
 const { width: canvasW } = $(useElementSize($$(dom)))
 const currentTheme = computed<'dark' | 'light'>(() => {
   return isDark.value ? 'dark' : 'light'
 })
+let p5Instance = $ref<p5 | null>(null)
 let fn = $ref<MathFn>(() => 0)
 let time = $ref(0)
 let highlightPoint = $ref({
@@ -26,7 +26,6 @@ let highlightPoint = $ref({
   x: -1,
 })
 let hoveredPointIndex = $ref(-1)
-
 let dots: Dot[] = []
 
 onMounted(() => {
@@ -83,28 +82,24 @@ const sketch = (s: p5) => {
     const x = s.mouseX
     const canvasLength = s.width
     const itemWidth = canvasLength / 32
-    let hoveredItemIndex = Math.ceil(x / itemWidth) - 1
-    hoveredPointIndex = hoveredItemIndex
+    const highlightX = Math.floor(x / itemWidth)
+    hoveredPointIndex = highlightX
   }
 
   s.mouseClicked = () => {
-    if (s.mouseX < 0 || s.mouseX > s.width || s.mouseY < 0 || s.mouseY > s.height) {
-      highlightPoint = {
-        i: -1,
-        x: -1,
-      }
+    if (s.width <= 0 || s.mouseX < 0 || s.mouseX > s.width || s.mouseY < 0 || s.mouseY > s.height) {
       return
     }
     const x = s.mouseX
     const canvasLength = s.width
     const itemWidth = canvasLength / 32
-    let clickedItemIndex = Math.ceil(x / itemWidth) - 1
-    if (clickedItemIndex === highlightPoint.i) {
-      clickedItemIndex = -1
+    let highlightX = Math.floor(x / itemWidth)
+    if (highlightX === highlightPoint.i) {
+      highlightX = -1
     }
     highlightPoint = {
-      i: clickedItemIndex,
-      x: clickedItemIndex,
+      i: highlightX,
+      x: highlightX,
     }
   }
 }
@@ -148,7 +143,7 @@ class Dot {
 
     const valueColor = value > 0 ? colors[currentTheme.value].plus : colors[currentTheme.value].minus
     const itemWidth = canvasLength / 32
-    const itemCenter = [itemWidth * this.x + itemWidth / 2, canvasLength / 2]
+    const itemCenter = [(this.x + 0.5) * itemWidth, canvasLength / 2]
     this.s.fill([...valueColor, opacity])
     this.s.rect(...itemCenter as [number, number], itemWidth / 2 - 1, canvasLength / 2 * value)
   }
@@ -177,7 +172,8 @@ defineExpose({
   <Spy
     v-if="highlightPoint.i !== -1"
     :fn="fn"
-    :params="{ ...highlightPoint, t: time }"
+    :time="time"
+    :params="highlightPoint"
     class="mt-8"
   />
 </template>

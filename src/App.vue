@@ -23,7 +23,7 @@ const paramList: IndexExpressionItem[] = [
   }
 ]
 
-let expression = $ref('sin(t + i/5)')
+let expression = $ref('sin(t)')
 let currentParam = $ref(paramList[0])
 const [dropDownOpen, toggleDropdown] = useToggle()
 
@@ -72,14 +72,35 @@ const setExpression = (exp: IndexExpressionItem) => {
 
 <style>
 html {
+  --c-bg: #ffffff;
+  --c-scroll: #d9d9d9;
+  --c-scroll-hover: #bbbbbb;
   background-color: #fafafa;
 }
 
 html.dark {
+  --c-bg: #212121;
+  --c-scroll: #333333;
+  --c-scroll-hover: #555555;
   background-color: #1e1e1e;
 }
 
 body {
   font-family: 'Fira Code', monospace;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-thumb {
+  background-color: var(--c-scroll);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--c-scroll-hover);
+}
+::-webkit-scrollbar-track {
+  background-color: var(--c-bg);
 }
 </style> 

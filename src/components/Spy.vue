@@ -8,24 +8,17 @@ import colors from '@/colors'
 
 interface Props {
   fn: MathFn
+  time: number
   params: {
-    t: number
-    i: number
-    x: number
+    [key: string]: number
   }
 }
 
 const props = defineProps<Props>()
 
-// todo: fix ts warning
-const parsedValue: { [key: string]: any } = computed(() => {
-  const { fn, params } = props
-  return {
-    t: params.t,
-    i: params.i,
-    x: params.x,
-    v: fn(params.t, params.i, params.x),
-  }
+const currentValue = computed(() => {
+  const { fn, time, params } = props
+  return fn(time, params.i, params.x, params.y)
 })
 const spyCanvas = $ref(null)
 let p5Instance = $ref<p5 | null>(null)
@@ -62,19 +55,19 @@ const sketch = (s: p5) => {
     s.line(0, 50, 350, 50)
     s.line(200, 0, 200, 100)
     for (let i = 0; i < 350; i++) {
-      const dotTime = parsedValue.value.t + (i - 200) / 30
-      const dotValue = props.fn(dotTime, parsedValue.value.i, parsedValue.value.x)
+      const dotTime = props.time + (i - 200) / 30
+      const dotValue = props.fn(dotTime, props.params.i, props.params.x, props.params.y)
       if (i > 200) {
         s.stroke(colors[currentTheme.value].foreground, 50)
       } else {
         s.stroke(colors[currentTheme.value].foreground)
       }
-      s.point(i, 50 - dotValue * 40)
+      s.point(i, 50 - dotValue * 50)
     }
 
     s.stroke(colors[currentTheme.value].foreground)
     s.strokeWeight(4)
-    s.point(200, 50 - parsedValue.value.v * 40)
+    s.point(200, 50 - currentValue.value * 50)
   }
 }
 
@@ -82,19 +75,26 @@ const sketch = (s: p5) => {
 
 <template>
   <div>
-    <div class="flex gap-2">
-      <div v-for="key in Object.keys(parsedValue)">
-        <div v-if="key !== 'v'" class="op-70">
-          <span class="text-xs">{{ key }}=</span>
-          <span class="text-xs">{{ parsedValue[key].toFixed(2) }}</span>    
+    <div class="flex justify-between items-end mb-1">
+      <div>
+        <div class="op-70">
+          <span class="text-xs">t=</span>
+          <span class="text-xs">{{ props.time.toFixed(2) }}</span>
+        </div>
+        <div class="flex gap-2 -mt-1">
+          <div v-for="key in Object.keys(props.params)">
+            <div class="op-70">
+              <span class="text-xs">{{ key }}=</span>
+              <span class="text-xs">{{ props.params[key] }}</span>    
+            </div>
+          </div>
         </div>
       </div>
-      <div class="flex-1"></div>
       <div>
         <span class="text-xs font-bold">value=</span>
-        <span class="text-xs">{{ parsedValue.v.toFixed(2) }}</span>
+        <span class="text-xs">{{ currentValue.toFixed(2) }}</span>
       </div>
     </div>
-    <div ref="spyCanvas" class="border border-gray-500"></div>
+    <div ref="spyCanvas" class="border border-gray-400 dark:border-truegray-600"></div>
   </div>
 </template>
