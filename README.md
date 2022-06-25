@@ -49,6 +49,8 @@ You can select the points you want to see in the spy mode. View an image of the 
 
 Highly inspired by [Tixy.land](https://tixy.land) and [Antfu.100](https://100.antfu.me/005).
 
+Engined by [p5.js](https://p5js.org/)
+
 # License
 
 MIT
